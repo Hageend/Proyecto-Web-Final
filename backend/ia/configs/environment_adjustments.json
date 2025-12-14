@@ -1,0 +1,23 @@
+{
+  "dungeon": {
+    "obstacle_multiplier": 0.3,
+    "room_min_size": 8,
+    "min_leaf_size": 12,
+    "cellular_automata_passes": 5
+  },
+  "string": {
+    "obstacle_multiplier": 0.3,
+    "cellular_automata_passes": 5
+  },
+  "forest": {
+    "extra_path_connections_prob": 0.5,
+    "path_width": 3,
+    "cellular_automata_passes": 5,
+    "random_walk_weight": 1,
+    "obstacle_multiplier": 2.0
+  },
+  "path_focused": {
+    "obstacle_multiplier": 0.3,
+    "cellular_automata_passes": 5
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "weights": {
+    "room_density": 0.11332768021385017,
+    "path_density": 0.051013298291958935,
+    "obstacle_density": 0.05,
+    "avg_room_size": 0.3928295106646685,
+    "connectivity": 0.3928295108295224
+  },
+  "iteration": 423,
+  "learning_rate": 0.1
+}
