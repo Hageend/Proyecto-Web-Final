@@ -2,6 +2,7 @@ import { Form, useNavigation, Link } from "react-router";
 import type { Route } from "./+types/home";
 import { apiFetch } from "../services/api";
 import { useState, useEffect } from "react";
+import { downloadMapAsPng } from "../utils/DownloadMap"; 
 
 // --- TIPOS ---
 interface MapConfig {
@@ -87,20 +88,22 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
   const rows = grid.length;
   const cols = grid[0]?.length || 0;
 
+  const handleDownload = () => {
+    downloadMapAsPng(grid, currentEnv, "mapa_generado");
+  };
+
   return (
     <div className="min-h-screen bg-neutral-950 text-white p-4 sm:p-8 flex flex-col items-center font-sans">
 
       {/* HEADER */}
       <div className="mb-6 text-center space-y-1">
-        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">
+        <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-cyan-500">
           Procedural Realms
         </h1>
       </div>
 
       {/* CONTROLES */}
       <div className="mb-6 bg-neutral-900 p-5 rounded-2xl border border-neutral-800 shadow-xl w-full max-w-2xl">
-        <div className="flex gap-4 mb-6">
-        </div>
         <Form method="post" className="flex flex-col md:flex-row gap-6 items-end justify-center">
 
           {/* Inputs de Dimensiones */}
@@ -130,7 +133,7 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
           </div>
 
           {/* Selector de Bioma */}
-          <div className="flex flex-col w-full md:w-auto flex-grow">
+          <div className="flex flex-col w-full md:w-auto grow">
             <label className="text-xs text-gray-400 mb-1 font-bold uppercase tracking-wider">
               Bioma
             </label>
@@ -153,29 +156,44 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
               w-full md:w-auto px-6 py-2 h-[42px] rounded-xl font-bold text-sm shadow-lg transition-all 
               ${isGenerating
                 ? "bg-neutral-700 text-gray-500 cursor-not-allowed"
-                : "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 hover:scale-105 text-white"}
+                : "bg-linear-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 hover:scale-105 text-white"}
             `}
           >
             {isGenerating ? "..." : "GENERAR"}
           </button>
           
         </Form>
-        
       </div>
+
       <Link
-            to="/train"
-            className="px-6 py-2 rounded-lg border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold transition flex items-center gap-2 w-fit m-5 mb-8"
-          >
-            🧠 Entrenar IA
-          </Link>
+        to="/train"
+        className="px-6 py-2 rounded-lg border border-purple-500 text-purple-400 hover:bg-purple-500/10 font-bold transition flex items-center gap-2 w-fit m-5 mb-8"
+      >
+        🧠 Entrenar IA
+      </Link>
 
       {/* VISUALIZADOR */}
       <div className="relative group">
-        <div className="absolute -inset-1 bg-gradient-to-r from-emerald-600 to-blue-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+        <div className="absolute -inset-1 bg-linear-to-r from-emerald-600 to-blue-600 rounded-xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
 
         <div className="relative bg-neutral-900 p-4 rounded-xl border border-neutral-800 shadow-2xl overflow-auto max-w-[95vw] max-h-[70vh]">
-          <div className="sticky top-0 left-0 mb-2 text-xs text-gray-500 font-mono">
-            Grid: {cols}x{rows}
+          
+          {/* BARRA DE INFORMACIÓN Y DESCARGA */}
+          <div className="sticky top-0 left-0 mb-4 flex justify-between items-center z-10 bg-neutral-900/90 backdrop-blur p-2 rounded-lg border border-neutral-800">
+            <div className="text-xs text-gray-500 font-mono">
+              Grid: {cols}x{rows}
+            </div>
+
+            <button
+              onClick={handleDownload}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-neutral-800 hover:bg-neutral-700 text-gray-300 hover:text-white transition text-xs font-bold border border-white/10 shadow-sm"
+              title="Descargar imagen PNG"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M12 9.75v8.25m0 0-3-3m3 3 3-3m-6-6h11.25a2.25 2.25 0 0 0 2.25-2.25V4.5a2.25 2.25 0 0 0-2.25-2.25h-13.5A2.25 2.25 0 0 0 2.25 4.5v4.5a2.25 2.25 0 0 0 2.25 2.25" />
+              </svg>
+              Descargar
+            </button>
           </div>
 
           <div
@@ -202,33 +220,29 @@ export default function Home({ loaderData, actionData }: Route.ComponentProps) {
           </div>
         </div>
       </div>
+
       {/* LEYENDA DE COLORES */}
       <div className="mt-6 flex flex-wrap gap-6 justify-center bg-neutral-900 p-4 rounded-xl border border-neutral-800 shadow-lg">
-
         {/*SUELO */}
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 bg-amber-100/90 rounded-sm shadow-sm"></div>
           <span className="text-gray-300 text-sm font-medium">Suelo</span>
         </div>
-
         {/*ROCA */}
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 bg-stone-500 rounded-full border border-stone-600 shadow-sm"></div>
           <span className="text-gray-300 text-sm font-medium">Roca</span>
         </div>
-
         {/*TRONCO */}
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 bg-amber-800 rounded-sm border border-amber-950 shadow-sm"></div>
           <span className="text-gray-300 text-sm font-medium">Tronco</span>
         </div>
-
         {/*VACÍO */}
         <div className="flex items-center gap-3">
           <div className="w-5 h-5 bg-neutral-950 border border-neutral-700 rounded-sm"></div>
           <span className="text-gray-500 text-sm font-medium">Vacío / Pared</span>
         </div>
-
       </div>
     </div>
   );

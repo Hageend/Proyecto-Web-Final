@@ -16,10 +16,8 @@ export function BrainMonitor() {
     }
   };
 
-  // 1. Cargar al montar
   useEffect(() => { fetchWeights(); }, []);
 
-  // 2. Recargar cada vez que terminamos de entrenar (cuando navigation vuelve a "idle")
   useEffect(() => {
     if (navigation.state === "idle") {
       fetchWeights();
